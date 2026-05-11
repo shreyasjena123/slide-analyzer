@@ -20,6 +20,8 @@ Learning objective: {objective}
 Slide metadata:
 {metadata}
 
+Important context: The presenter may be speaking during this slide. Do not flag Multimedia or Redundancy violations based on minimal on-slide text alone if the slide appears to be a title, transition, agenda, or discussion slide — sparse slides are often intentional.
+
 Analyze this slide against all 5 Mayer principles. Return ONLY valid JSON:
 {{
   "violations": [
@@ -60,7 +62,8 @@ def analyze_slide(slide: SlideData, png_b64: str, learning_objective: str) -> di
             }
         ],
     )
-    return json.loads(response.content[0].text)
+    text = response.content[0].text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+    return json.loads(text)
 
 
 def analyze_deck(slides: list[SlideData], pngs: list[str], learning_objective: str) -> list[dict]:
