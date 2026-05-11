@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 
 @app.post("/analyze")
@@ -33,6 +33,7 @@ async def analyze(
         slides = extract(tmp_path)
         pngs = render_pdf_to_pngs(tmp_path)
         results = analyze_deck(slides, pngs, learning_objective)
+        assert len(slides) == len(pngs) == len(results)
     finally:
         os.unlink(tmp_path)
 
