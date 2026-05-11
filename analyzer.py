@@ -20,7 +20,7 @@ Learning objective: {objective}
 Slide metadata:
 {metadata}
 
-Analyze this slide against all 5 Mayer principles. Return ONLY valid JSON:
+Analyze this slide against all 5 Mayer principles. Only flag a violation if it would NOTICEABLY impair a student's understanding — skip borderline, pedantic, or marginal cases. When in doubt, don't flag it. Return ONLY valid JSON:
 {{
   "violations": [
     {{
@@ -35,6 +35,9 @@ Analyze this slide against all 5 Mayer principles. Return ONLY valid JSON:
 
 
 def analyze_slide(slide: SlideData, png_b64: str, learning_objective: str) -> dict:
+    if slide.slide_type() in ("title/transition", "section/transition"):
+        return {"violations": [], "passes": ["Coherence", "Signaling", "Spatial Contiguity", "Multimedia", "Redundancy"]}
+
     prompt = _USER_TEMPLATE.format(
         objective=learning_objective,
         metadata=slide.to_prompt_text(),

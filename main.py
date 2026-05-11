@@ -1,6 +1,9 @@
 import os
 import tempfile
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -37,10 +40,10 @@ async def analyze(
     finally:
         os.unlink(tmp_path)
 
-    slide_data = [
-        {"slide": slide, "png": png, "result": result}
-        for slide, png, result in zip(slides, pngs, results)
-    ]
+    slide_data = []
+    for slide, png, result in zip(slides, pngs, results):
+        result["violations"] = [v for v in result["violations"] if v.get("severity") != "low"]
+        slide_data.append({"slide": slide, "png": png, "result": result})
     total_violations = sum(len(d["result"]["violations"]) for d in slide_data)
 
     html = templates.get_template("report.html").render(
