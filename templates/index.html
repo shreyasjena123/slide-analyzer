@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Slide Analyzer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="upload-form">
+    <h1>Slide Analyzer</h1>
+    <p>Analyze your PDF slides against Mayer's Multimedia Learning Principles.</p>
+    <form action="/analyze" method="post" enctype="multipart/form-data">
+      <label>
+        PDF Slide Deck
+        <input type="file" name="file" accept=".pdf" required>
+      </label>
+      <label>
+        Learning Objective
+        <input
+          type="text"
+          name="learning_objective"
+          placeholder="e.g. Students will understand how ATP is produced in mitochondria"
+          required
+        >
+      </label>
+      <button type="submit">Analyze Slides</button>
+    </form>
+  </main>
+</body>
+</html>
