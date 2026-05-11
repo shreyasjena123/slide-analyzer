@@ -20,8 +20,6 @@ Learning objective: {objective}
 Slide metadata:
 {metadata}
 
-Important context: The presenter may be speaking during this slide. Do not flag Multimedia or Redundancy violations based on minimal on-slide text alone if the slide appears to be a title, transition, agenda, or discussion slide — sparse slides are often intentional.
-
 Analyze this slide against all 5 Mayer principles. Return ONLY valid JSON:
 {{
   "violations": [

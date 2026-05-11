@@ -26,9 +26,25 @@ class SlideData:
         # Flag if average centers are more than 40% of slide width apart
         return abs(avg_img_x - avg_txt_x) > 0.4
 
+    _TRANSITION_KEYWORDS = {
+        "overview", "agenda", "outline", "objectives", "objective",
+        "questions", "thank", "summary", "contents", "today", "recap",
+        "review", "introduction", "intro", "break", "discussion",
+    }
+
+    def slide_type(self) -> str:
+        """Heuristic classification: title/transition, section, or content."""
+        title_words = set(self.title.lower().split())
+        if title_words & self._TRANSITION_KEYWORDS:
+            return "section/transition"
+        if len(self.body_text.strip()) < 60 and self.image_count == 0:
+            return "title/transition"
+        return "content"
+
     def to_prompt_text(self) -> str:
         lines = [
             f"Slide {self.num}",
+            f"Slide type: {self.slide_type()} (title/transition slides are intentionally sparse — be lenient)",
             f"Title: {self.title or '(no title)'}",
             f"Body text: {self.body_text or '(none)'}",
             f"Speaker notes: {self.notes or '(none)'}",
