@@ -29,10 +29,6 @@ async def analyze(
     file: UploadFile = File(...),
     learning_objective: str = Form(...),
 ):
-    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-        tmp.write(await file.read())
-        tmp_path = tmp.name
-
     suffix = os.path.splitext(file.filename)[1].lower()
     tmp_suffix = suffix if suffix in (".pdf", ".pptx") else ".pdf"
     with tempfile.NamedTemporaryFile(suffix=tmp_suffix, delete=False) as tmp:
