@@ -89,7 +89,12 @@ def extract_pptx(path: str) -> list[SlideData]:
                 text = shape.text_frame.text.strip()
                 if not text:
                     continue
-                if shape.name.lower().startswith("title") or (hasattr(shape, "placeholder_format") and shape.placeholder_format and shape.placeholder_format.idx == 0):
+                try:
+                    ph = shape.placeholder_format
+                    ph_idx = ph.idx if ph is not None else -1
+                except (ValueError, AttributeError):
+                    ph_idx = -1
+                if shape.name.lower().startswith("title") or ph_idx == 0:
                     title = text
                 else:
                     body_parts.append(text)
@@ -136,7 +141,7 @@ def extract_pdf(path: str) -> list[SlideData]:
                 avg_size = sum(
                     span["size"] for line in block["lines"] for span in line["spans"]
                 ) / max(sum(len(line["spans"]) for line in block["lines"]), 1)
-                if not title and y0 < h * 0.25 and avg_size > 14:
+                if not title and y0 < h * 0.25 and avg_size > 14 and len(text) < 120:
                     title = text
                 else:
                     body_parts.append(text)
