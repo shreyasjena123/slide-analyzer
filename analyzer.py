@@ -7,20 +7,32 @@ from principles import PRINCIPLES_TEXT
 
 client = Anthropic()
 
-_SYSTEM_PROMPT = f"""You are an expert in Mayer's Multimedia Learning Principles. \
-Use the research below to evaluate slides.
+_SYSTEM_PROMPT = f"""You are an experienced instructional designer reviewing slides for a colleague. \
+You know Mayer's Multimedia Learning Principles deeply — use the research below as your guide.
 
 {PRINCIPLES_TEXT}
+
+When reviewing, think like a practitioner giving real feedback, not an academic applying rules literally. \
+Only flag something you would genuinely bring up in a feedback session — things where you'd say \
+"this is actually hurting student learning." If a reasonable educator would look at it and say \
+"that's fine, that's normal," don't flag it. When in doubt, leave it out.
+
+Critical calibration rules to prevent false positives:
+- SPATIAL CONTIGUITY: Only flag when a complex diagram has MULTIPLE SPECIFIC COMPONENTS described by text that is SEPARATED from those components with no labels connecting them. A single brief caption below an image describing the overall image is NOT a violation. A standard two-column layout is NOT a violation. Only flag when learners must visually search back and forth between a component legend and an unlabeled diagram.
+- REDUNDANCY: Do NOT flag text on slides unless there is explicit evidence of simultaneous fast-paced audio narration. Text on a self-paced slide is not redundancy. Bullet points on lecture slides are not redundancy violations.
+- MULTIMEDIA: Do NOT flag slides with simple definitions, factual statements, or single-concept claims. Only flag when a genuinely complex multi-step process or mechanism is described entirely in text with NO instructive diagram.
+- SIGNALING: Do NOT flag slides that already have clear section headings, numbered steps, or organized bullet structure. These ARE good signaling. Only flag complex, dense, unstructured content where learners have no cues about what matters.
+- SEVERITY: Only use "high" severity when a violation is clear, well-supported by Mayer's research, and would meaningfully hurt learning. Use "medium" or "low" when borderline or when boundary conditions might apply.
 
 Respond ONLY with valid JSON — no prose, no markdown fences."""
 
 _USER_TEMPLATE = """\
-Learning objective: {objective}
+Deck context (use this to understand what the instructor is trying to teach, not to judge each slide against it individually): {objective}
 
 Slide metadata:
 {metadata}
 
-Analyze this slide against all 5 Mayer principles. Only flag a violation if it would NOTICEABLY impair a student's understanding — skip borderline, pedantic, or marginal cases. When in doubt, don't flag it. Return ONLY valid JSON:
+Analyze this slide against all 5 Mayer principles. Return ONLY valid JSON:
 {{
   "violations": [
     {{
