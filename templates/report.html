@@ -2,73 +2,359 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Slide Analysis Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slide Analysis Report — {{ deck_name }}</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.5; padding: 2rem; }
-    .header { max-width: 900px; margin: 0 auto 2rem; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
-    .header h1 { font-size: 1.75rem; margin-bottom: 0.75rem; }
-    .header p { color: #555; margin-bottom: 0.25rem; }
-    .summary-badge { display: inline-block; margin-top: 0.75rem; padding: 0.25rem 0.75rem; background: #fee2e2; color: #991b1b; border-radius: 999px; font-weight: 700; font-size: 0.875rem; }
-    .summary-badge.clean { background: #dcfce7; color: #166534; }
-    .slide { max-width: 900px; margin: 0 auto 2rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; }
-    .slide-header { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; font-weight: 700; font-size: 1rem; }
-    .slide-body { display: flex; gap: 1.5rem; padding: 1.5rem; }
-    .slide-thumb { flex-shrink: 0; width: 280px; }
-    .slide-thumb img { width: 100%; border: 1px solid #e5e7eb; border-radius: 4px; }
-    .slide-findings { flex: 1; }
-    .violation { margin-bottom: 1rem; padding: 0.75rem 1rem; border-left: 4px solid #f59e0b; background: #fffbeb; border-radius: 0 4px 4px 0; }
-    .violation.high { border-color: #ef4444; background: #fef2f2; }
-    .violation.low { border-color: #3b82f6; background: #eff6ff; }
-    .badge { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem; }
-    .violation p { font-size: 0.9rem; margin-top: 0.25rem; }
-    .pass { font-size: 0.875rem; color: #166534; padding: 0.2rem 0; }
-    .passes-header { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-top: 1rem; margin-bottom: 0.25rem; }
+
+    :root {
+      --red:    #dc2626; --red-bg:    #fef2f2; --red-border:    #fca5a5;
+      --amber:  #d97706; --amber-bg:  #fffbeb; --amber-border:  #fcd34d;
+      --blue:   #2563eb; --blue-bg:   #eff6ff; --blue-border:   #93c5fd;
+      --green:  #16a34a; --green-bg:  #f0fdf4; --green-border:  #86efac;
+      --slate:  #475569;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      line-height: 1.55;
+      padding: 2rem 1rem;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .report-header {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .report-header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: .4rem; }
+    .report-meta { font-size: .9rem; color: var(--slate); margin-bottom: .2rem; }
+
+    /* ── Scorecard ── */
+    .scorecard {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .scorecard h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #0f172a; }
+
+    .score-row { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .score-dial {
+      flex-shrink: 0;
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-weight: 800;
+    }
+    .score-dial .score-num { font-size: 2rem; line-height: 1; }
+    .score-dial .score-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .06em; margin-top: .1rem; }
+    .score-high   { background: var(--green-bg);  color: var(--green);  border: 3px solid var(--green-border); }
+    .score-medium { background: var(--amber-bg);  color: var(--amber);  border: 3px solid var(--amber-border); }
+    .score-low    { background: var(--red-bg);    color: var(--red);    border: 3px solid var(--red-border); }
+
+    .score-summary { font-size: .95rem; color: var(--slate); }
+    .score-summary strong { color: #0f172a; }
+
+    .principle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: .75rem;
+    }
+    .principle-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: .75rem 1rem;
+    }
+    .principle-card .p-name { font-size: .78rem; font-weight: 700; color: #334155; margin-bottom: .3rem; }
+    .principle-card .p-d    { font-size: .7rem; color: var(--slate); margin-bottom: .4rem; }
+    .p-bar-track {
+      height: 6px; border-radius: 3px; background: #e2e8f0; overflow: hidden;
+    }
+    .p-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+    .bar-green  { background: var(--green); }
+    .bar-amber  { background: var(--amber); }
+    .bar-red    { background: var(--red); }
+    .principle-card .p-stat { font-size: .72rem; color: var(--slate); margin-top: .35rem; }
+
+    /* ── Slide cards ── */
+    .slides-section h2 {
+      font-size: 1.1rem; font-weight: 700; color: #0f172a;
+      margin-bottom: 1rem;
+    }
+
+    .slide-card {
+      background: #fff;
+      border-radius: var(--radius);
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    .slide-card.has-high   { border-left: 4px solid var(--red); }
+    .slide-card.has-medium { border-left: 4px solid var(--amber); }
+    .slide-card.clean      { border-left: 4px solid var(--green); }
+    .slide-card.skipped    { border-left: 4px solid #cbd5e1; opacity: .75; }
+
+    .slide-top {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .85rem 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .slide-num {
+      font-weight: 700; font-size: .8rem;
+      background: #f1f5f9; color: var(--slate);
+      padding: .2rem .55rem; border-radius: 4px;
+      white-space: nowrap;
+    }
+    .slide-title { font-weight: 600; font-size: .95rem; flex: 1; }
+    .slide-status-badge {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; padding: .2rem .55rem; border-radius: 999px;
+    }
+    .badge-clean   { background: var(--green-bg);  color: var(--green); }
+    .badge-issue   { background: var(--red-bg);    color: var(--red); }
+    .badge-skipped { background: #f1f5f9; color: var(--slate); }
+
+    .slide-body {
+      display: flex; gap: 1.25rem; padding: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .slide-thumb {
+      flex-shrink: 0; width: 220px;
+    }
+    .slide-thumb img {
+      width: 100%; border-radius: 5px;
+      border: 1px solid #e2e8f0;
+      display: block;
+    }
+    .thumb-caption {
+      font-size: .68rem; color: var(--slate);
+      text-align: center; margin-top: .3rem;
+    }
+
+    .slide-findings { flex: 1; min-width: 0; }
+
+    /* ── Violation cards ── */
+    .violation {
+      border-radius: 7px;
+      padding: .85rem 1rem;
+      margin-bottom: .85rem;
+      border: 1px solid;
+    }
+    .violation.high   { background: var(--red-bg);   border-color: var(--red-border); }
+    .violation.medium { background: var(--amber-bg); border-color: var(--amber-border); }
+    .violation.low    { background: var(--blue-bg);  border-color: var(--blue-border); }
+
+    .v-header {
+      display: flex; align-items: center; flex-wrap: wrap; gap: .4rem;
+      margin-bottom: .5rem;
+    }
+    .v-principle {
+      font-size: .75rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .high   .v-principle { color: var(--red); }
+    .medium .v-principle { color: var(--amber); }
+    .low    .v-principle { color: var(--blue); }
+
+    .v-severity {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      padding: .15rem .45rem; border-radius: 4px;
+    }
+    .high   .v-severity { background: var(--red);   color: #fff; }
+    .medium .v-severity { background: var(--amber); color: #fff; }
+    .low    .v-severity { background: var(--blue);  color: #fff; }
+
+    .v-confidence {
+      font-size: .68rem; color: var(--slate);
+      border: 1px solid #cbd5e1; border-radius: 4px;
+      padding: .15rem .45rem;
+      display: flex; align-items: center; gap: .25rem;
+    }
+    .conf-dot {
+      width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+    }
+    .conf-high   .conf-dot { background: var(--green); }
+    .conf-medium .conf-dot { background: var(--amber); }
+
+    .v-finding { font-size: .875rem; margin-bottom: .35rem; }
+    .v-why {
+      font-size: .8rem; color: var(--slate);
+      font-style: italic; margin-bottom: .4rem;
+      padding-left: .6rem; border-left: 2px solid #cbd5e1;
+    }
+    .v-rec {
+      font-size: .82rem;
+      background: rgba(255,255,255,.65);
+      border-radius: 5px; padding: .45rem .65rem;
+    }
+    .v-rec strong { color: #0f172a; }
+
+    /* ── Passes ── */
+    .passes-section { margin-top: .75rem; }
+    .passes-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: #94a3b8; margin-bottom: .35rem;
+    }
+    .passes-list { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .pass-tag {
+      font-size: .75rem; color: var(--green);
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      border-radius: 4px; padding: .15rem .5rem;
+    }
+
+    .skipped-msg {
+      font-size: .85rem; color: var(--slate);
+      font-style: italic; padding: .5rem 0;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
+<div class="container">
+
+  <!-- Header -->
+  <div class="report-header">
     <h1>Slide Analysis Report</h1>
-    <p><strong>Deck:</strong> {{ deck_name }}</p>
-    <p><strong>Learning objective:</strong> {{ learning_objective }}</p>
-    <span class="summary-badge {% if total_violations == 0 %}clean{% endif %}">
-      {% if total_violations == 0 %}No violations found{% else %}{{ total_violations }} violation{{ 's' if total_violations != 1 else '' }} found{% endif %}
-    </span>
+    <p class="report-meta"><strong>Deck:</strong> {{ deck_name }}</p>
+    <p class="report-meta"><strong>Learning objective:</strong> {{ learning_objective }}</p>
   </div>
 
-  {% for item in slide_data %}
-  <div class="slide">
-    <div class="slide-header">
-      Slide {{ item.slide.num }}{% if item.slide.title %}: {{ item.slide.title }}{% endif %}
+  <!-- Scorecard -->
+  <div class="scorecard">
+    <h2>Deck Scorecard</h2>
+    <div class="score-row">
+      {% set sc = scorecard.overall_score %}
+      <div class="score-dial {% if sc >= 80 %}score-high{% elif sc >= 55 %}score-medium{% else %}score-low{% endif %}">
+        <span class="score-num">{{ sc }}</span>
+        <span class="score-label">/ 100</span>
+      </div>
+      <div class="score-summary">
+        {% if scorecard.high_violations == 0 and total_violations == 0 %}
+          <strong>No violations detected.</strong><br>
+          All {{ scorecard.n_content_slides }} content slides pass Mayer's principles.
+        {% elif scorecard.high_violations > 0 %}
+          <strong>{{ scorecard.high_violations }} high-severity issue{{ 's' if scorecard.high_violations != 1 else '' }}</strong>
+          across {{ scorecard.n_content_slides }} content slides.<br>
+          {{ total_violations }} total violation{{ 's' if total_violations != 1 else '' }} flagged.
+        {% else %}
+          <strong>{{ total_violations }} violation{{ 's' if total_violations != 1 else '' }}</strong>
+          across {{ scorecard.n_content_slides }} content slides.<br>
+          No high-severity issues found.
+        {% endif %}
+        <br><span style="font-size:.8rem;color:#94a3b8;">Score is weighted by Mayer effect sizes (d-values).</span>
+      </div>
     </div>
-    <div class="slide-body">
-      <div class="slide-thumb">
-        <img src="data:image/png;base64,{{ item.png }}" alt="Slide {{ item.slide.num }}">
-      </div>
-      <div class="slide-findings">
-        {% if item.result.violations %}
-          {% for v in item.result.violations %}
-          <div class="violation {{ v.severity }}">
-            <span class="badge">⚠ {{ v.principle }} &middot; {{ v.severity }} priority</span>
-            <p><strong>Finding:</strong> {{ v.finding }}</p>
-            <p><strong>Fix:</strong> {{ v.recommendation }}</p>
-          </div>
-          {% endfor %}
-        {% endif %}
 
-        {% if item.result.passes %}
-        <div class="passes-header">Passes</div>
-        {% for p in item.result.passes %}
-        <div class="pass">✓ {{ p }}</div>
-        {% endfor %}
-        {% endif %}
-
-        {% if not item.result.violations and not item.result.passes %}
-        <p style="color:#6b7280;font-size:0.9rem;">No analysis data for this slide.</p>
-        {% endif %}
+    <div class="principle-grid">
+      {% for p in scorecard.principles %}
+      {% set pct = (p.pass_rate * 100) | int %}
+      <div class="principle-card">
+        <div class="p-name">{{ p.name }}</div>
+        <div class="p-d">Mayer d = {{ p.d_value }}</div>
+        <div class="p-bar-track">
+          <div class="p-bar-fill {% if pct >= 80 %}bar-green{% elif pct >= 50 %}bar-amber{% else %}bar-red{% endif %}"
+               style="width:{{ pct }}%"></div>
+        </div>
+        <div class="p-stat">
+          {% if p.violations == 0 %}✓ No violations{% else %}{{ p.violations }} violation{{ 's' if p.violations != 1 else '' }}{% endif %}
+        </div>
       </div>
+      {% endfor %}
     </div>
   </div>
-  {% endfor %}
+
+  <!-- Slide-by-slide findings -->
+  <div class="slides-section">
+    <h2>Slide-by-Slide Findings</h2>
+
+    {% for item in slide_data %}
+    {% set violations = item.result.violations %}
+    {% set passes = item.result.passes %}
+    {% set is_skipped = item.slide.slide_type() in ('title/transition', 'section/transition') %}
+    {% set has_high = violations | selectattr('severity', 'equalto', 'high') | list | length > 0 %}
+
+    <div class="slide-card {% if is_skipped %}skipped{% elif violations | length == 0 %}clean{% elif has_high %}has-high{% else %}has-medium{% endif %}">
+
+      <div class="slide-top">
+        <span class="slide-num">Slide {{ item.slide.num }}</span>
+        <span class="slide-title">{{ item.slide.title or '(no title)' }}</span>
+        {% if is_skipped %}
+          <span class="slide-status-badge badge-skipped">Transition</span>
+        {% elif violations | length == 0 %}
+          <span class="slide-status-badge badge-clean">✓ Passes all</span>
+        {% else %}
+          <span class="slide-status-badge badge-issue">{{ violations | length }} issue{{ 's' if violations | length != 1 else '' }}</span>
+        {% endif %}
+      </div>
+
+      <div class="slide-body">
+        <div class="slide-thumb">
+          <img src="data:image/png;base64,{{ item.png }}" alt="Slide {{ item.slide.num }}">
+          <div class="thumb-caption">Slide {{ item.slide.num }}</div>
+        </div>
+
+        <div class="slide-findings">
+          {% if is_skipped %}
+            <p class="skipped-msg">Title or transition slide — not analyzed (Mayer: these are intentionally sparse).</p>
+
+          {% elif violations | length == 0 %}
+            <p style="font-size:.875rem;color:var(--green);font-weight:600;margin-bottom:.5rem;">✓ No violations found on this slide.</p>
+            {% if passes %}
+            <div class="passes-section">
+              <div class="passes-label">Principles passed</div>
+              <div class="passes-list">
+                {% for p in passes %}<span class="pass-tag">✓ {{ p }}</span>{% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+          {% else %}
+            {% for v in violations %}
+            <div class="violation {{ v.severity }}">
+              <div class="v-header">
+                <span class="v-principle">{{ v.principle }}</span>
+                <span class="v-severity">{{ v.severity }}</span>
+                <span class="v-confidence conf-{{ v.confidence }}">
+                  <span class="conf-dot"></span>
+                  {{ v.confidence | capitalize }} confidence &middot; {{ v.evidence }}
+                </span>
+              </div>
+              <p class="v-finding">{{ v.finding }}</p>
+              {% if v.why_it_matters %}
+              <p class="v-why">{{ v.why_it_matters }}</p>
+              {% endif %}
+              <div class="v-rec"><strong>Fix:</strong> {{ v.recommendation }}</div>
+            </div>
+            {% endfor %}
+
+            {% if passes %}
+            <div class="passes-section">
+              <div class="passes-label">Principles passed</div>
+              <div class="passes-list">
+                {% for p in passes %}<span class="pass-tag">✓ {{ p }}</span>{% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
 </body>
 </html>

@@ -38,12 +38,35 @@ Analyze this slide against all 5 Mayer principles. Return ONLY valid JSON:
     {{
       "principle": "Coherence|Signaling|Spatial Contiguity|Multimedia|Redundancy",
       "severity": "high|medium|low",
-      "finding": "one sentence describing the issue",
-      "recommendation": "one sentence fix"
+      "finding": "one sentence describing the specific issue on this slide",
+      "recommendation": "one sentence fix",
+      "why_it_matters": "one sentence grounded in Mayer's research — cite the specific cognitive mechanism or study finding that explains why this hurts learning (e.g. 'Mayer found extraneous material competes for limited working memory, reducing transfer test scores by d=0.86.')"
     }}
   ],
   "passes": ["principle names with no violations"]
 }}"""
+
+
+# Confidence levels grounded in Mayer's effect sizes and study conditions.
+# High = strong, replicated effect under broad conditions (d ≥ 0.82).
+# Medium = moderate effect or applies only under specific conditions (d 0.70–0.79).
+_PRINCIPLE_CONFIDENCE = {
+    "Multimedia":         ("high",   "d=1.35 across 13 studies"),
+    "Coherence":          ("high",   "d=0.86 across 19 studies"),
+    "Spatial Contiguity": ("high",   "d=0.82 across 9 studies"),
+    "Redundancy":         ("medium", "d=0.72, applies to fast-paced narrated presentations"),
+    "Signaling":          ("medium", "d=0.70 across 16 studies"),
+}
+
+
+def _enrich_violations(violations: list[dict]) -> list[dict]:
+    """Add confidence and evidence fields to each violation based on principle."""
+    enriched = []
+    for v in violations:
+        principle = v.get("principle", "")
+        level, evidence = _PRINCIPLE_CONFIDENCE.get(principle, ("medium", ""))
+        enriched.append({**v, "confidence": level, "evidence": evidence})
+    return enriched
 
 
 def analyze_slide(slide: SlideData, png_b64: str, learning_objective: str) -> dict:
@@ -76,7 +99,9 @@ def analyze_slide(slide: SlideData, png_b64: str, learning_objective: str) -> di
         ],
     )
     text = response.content[0].text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    return json.loads(text)
+    result = json.loads(text)
+    result["violations"] = _enrich_violations(result.get("violations", []))
+    return result
 
 
 def analyze_deck(slides: list[SlideData], pngs: list[str], learning_objective: str) -> list[dict]:
