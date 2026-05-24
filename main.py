@@ -27,7 +27,6 @@ async def index(request: Request):
 @app.post("/analyze")
 async def analyze(
     file: UploadFile = File(...),
-    learning_objective: str = Form(...),
 ):
     suffix = os.path.splitext(file.filename)[1].lower()
     tmp_suffix = suffix if suffix in (".pdf", ".pptx") else ".pdf"
@@ -38,7 +37,7 @@ async def analyze(
     try:
         slides = extract(tmp_path)
         pngs = render_to_pngs(tmp_path)
-        results = analyze_deck(slides, pngs, learning_objective)
+        results = await analyze_deck(slides, pngs)
         assert len(slides) == len(pngs) == len(results)
     finally:
         os.unlink(tmp_path)
@@ -53,7 +52,6 @@ async def analyze(
 
     html = templates.get_template("report.html").render(
         deck_name=file.filename,
-        learning_objective=learning_objective,
         slide_data=slide_data,
         total_violations=total_violations,
         scorecard=scorecard,
@@ -66,13 +64,19 @@ async def analyze(
     )
 
 
-_ALL_PRINCIPLES = ["Multimedia", "Coherence", "Signaling", "Spatial Contiguity", "Redundancy"]
+_ALL_PRINCIPLES = [
+    "Multimedia", "Coherence", "Spatial Contiguity", "Temporal Contiguity",
+    "Modality", "Pre-Training", "Redundancy", "Signaling",
+]
 _PRINCIPLE_D = {
-    "Multimedia": 1.35,
-    "Coherence": 0.86,
-    "Spatial Contiguity": 0.82,
-    "Redundancy": 0.72,
-    "Signaling": 0.70,
+    "Multimedia":          1.35,
+    "Temporal Contiguity": 1.31,
+    "Modality":            1.00,
+    "Coherence":           0.86,
+    "Spatial Contiguity":  0.82,
+    "Pre-Training":        0.78,
+    "Redundancy":          0.72,
+    "Signaling":           0.70,
 }
 
 

@@ -54,7 +54,10 @@ DECKS = [
 MOCK_PIPELINE = os.environ.get("MOCK_PIPELINE", "0") == "1"
 HAS_API_KEY = bool(os.environ.get("ANTHROPIC_API_KEY"))
 
-VALID_PRINCIPLES = {"Coherence", "Signaling", "Spatial Contiguity", "Multimedia", "Redundancy"}
+VALID_PRINCIPLES = {
+    "Coherence", "Signaling", "Spatial Contiguity", "Multimedia", "Redundancy",
+    "Temporal Contiguity", "Pre-Training", "Modality",
+}
 VALID_SEVERITIES = {"high", "medium", "low"}
 
 MOCK_RESULT = {
@@ -103,9 +106,9 @@ def _run_pipeline(deck_path: Path, objective: str) -> tuple[List[SlideData], Lis
     pngs = [BLANK_PNG] * len(slides)
     if MOCK_PIPELINE or not HAS_API_KEY:
         with patch("analyzer.client.messages.create", return_value=_mock_message(MOCK_RESULT)):
-            results = analyze_deck(slides, pngs, objective)
+            results = analyze_deck(slides, pngs)
     else:
-        results = analyze_deck(slides, pngs, objective)
+        results = analyze_deck(slides, pngs)
     return slides, results
 
 

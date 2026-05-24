@@ -5,7 +5,7 @@ import zlib
 import fitz
 
 
-def render_pdf_to_pngs(path: str, dpi: int = 150) -> list[str]:
+def render_pdf_to_pngs(path: str, dpi: int = 96) -> list[str]:
     """Render each PDF page to a base64-encoded PNG string."""
     doc = fitz.open(path)
     matrix = fitz.Matrix(dpi / 72, dpi / 72)
@@ -15,7 +15,7 @@ def render_pdf_to_pngs(path: str, dpi: int = 150) -> list[str]:
     ]
 
 
-def render_pptx_to_pngs(path: str, dpi: int = 150) -> list[str]:
+def render_pptx_to_pngs(path: str, dpi: int = 96) -> list[str]:
     """Render each PPTX slide to a base64-encoded PNG by converting via an in-memory PDF."""
     import subprocess, tempfile, os, sys
 
@@ -59,7 +59,7 @@ def _blank_png_b64() -> str:
     return base64.b64encode(header + ihdr_full + idat_full + iend_full).decode()
 
 
-def render_to_pngs(path: str, dpi: int = 150) -> list[str]:
+def render_to_pngs(path: str, dpi: int = 96) -> list[str]:
     """Dispatch to the right renderer based on file extension."""
     from pathlib import Path
     suffix = Path(path).suffix.lower()

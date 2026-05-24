@@ -1,5 +1,6 @@
 # Grounded in Mayer, R.E. (2020). Multimedia Learning (3rd ed.).
-# Chapters: 5 (Multimedia), 6 (Coherence), 7 (Signaling), 8 (Redundancy), 9 (Spatial Contiguity).
+# Chapters: 5 (Multimedia), 6 (Coherence), 7 (Signaling), 8 (Redundancy), 9 (Spatial Contiguity),
+#           10 (Temporal Contiguity), 12 (Pre-Training), 13 (Modality).
 # Boundary conditions extracted directly from Mayer's own text and cited studies.
 
 PRINCIPLES_TEXT = """
@@ -123,4 +124,62 @@ WHAT IS NOT A VIOLATION — these are the specific conditions where the effect d
 - RETENTION-FOCUSED MATERIAL: Effect is substantially weaker for retention (g=0.39) than transfer (g=0.65). A slide designed for recall rather than deep understanding is less affected.
 
 Analyzer calibration: Flag only when: (1) complex material, AND (2) text describes specific components of a diagram, AND (3) corresponding elements have no labels or spatial connection, AND (4) the audience is likely low-prior-knowledge. Do not flag standard two-column layouts, simple graphics with captions, self-explanatory diagrams, narrated slides, or slides for expert audiences.
+
+=== TEMPORAL CONTIGUITY PRINCIPLE (d=1.31, Ch. 10) ===
+Mayer's definition: "People learn better when corresponding words and pictures are presented simultaneously rather than successively."
+
+Effect size context: d=1.31 across 8 studies (Mayer & Anderson 1991, 1992; Mayer & Sims 1994; Mayer et al. 1999) — all with college students, all computer-based narrated animations on mechanical/scientific processes (pumps, brakes, lightning, lungs), all measuring transfer tests. The violation being studied was presenting the ENTIRE narration THEN the ENTIRE animation as separate large blocks (140 seconds apart), not brief alternation.
+
+WHAT IS A VIOLATION:
+- A deck explicitly structured so that all spoken audio narration runs as a separate segment BEFORE or AFTER all corresponding slides are shown — meaning learners must hold an entire narration in working memory while waiting for the visuals (or vice versa). This is the "large successive block" pattern Mayer studied.
+- An instructional video or animation where audio commentary describes one phase of a process while the screen shows a completely different phase — systematic misalignment throughout the lesson.
+
+WHAT IS NOT A VIOLATION — these are the specific conditions where the effect disappears:
+- SHORT ALTERNATING SEGMENTS: When successive presentation alternates in short segments (8–10 seconds of narration then 8–10 seconds of matching animation), the effect essentially disappears — median d<0.20 in three experiments (Mayer et al. 1999; Moreno & Mayer 1999). Any reasonable slide-by-slide presentation where each slide's narration and visuals are reasonably close in time does NOT violate this principle.
+- LEARNER-CONTROLLED PACING: Michas & Berry (2000): learner-paced successive presentation showed d=0.09 (negligible). When learners control pace — as in any standard self-paced or presenter-advanced slide deck — they can re-examine material and the temporal contiguity effect is minimal or absent.
+- STANDARD SLIDE PRESENTATIONS: A presenter advancing slides one by one while speaking about each slide IS presenting words and pictures in close temporal proximity. This is NOT successive large-block presentation. Do not flag a normal slide deck for temporal contiguity.
+- NOTE: Mayer's studies required the boundary to be COMPLETE separation of ALL words from ALL pictures across the entire lesson. Slides shown in sequence where each slide has narration delivered while that slide is visible already achieve temporal contiguity.
+
+Analyzer calibration: This principle is extremely difficult to violate in a standard slide deck, because individual slides with corresponding narration already achieve temporal contiguity. Flag ONLY when there is explicit structural evidence that a full audio track is presented completely before OR after all the visual slides — the "separate audio file, then slides" or "slides first, audio commentary later" pattern. A normal presented deck does not violate this principle.
+
+=== PRE-TRAINING PRINCIPLE (d=0.78, Ch. 12) ===
+Mayer's definition: "People learn more deeply from a multimedia message when they know the names and characteristics of the main concepts."
+
+Effect size context: d=0.78 across 10 studies (Mayer et al. 2002a x3; Mayer et al. 2002b x2; Gegner et al. 2009 x2; Fiorella & Mayer 2012; Pilegard & Mayer 2016, 2018) — all involved complex multi-component systems (hydraulic brakes, tire pump, geology simulation, electrical circuits, adventure games) where learners were novices unfamiliar with component terminology. Pre-training provided names, locations, and states of each key part BEFORE the main lesson.
+
+WHAT IS A VIOLATION:
+- A complex technical lesson that immediately launches into a multi-step causal explanation of how a system works, using component names (pistons, valves, cylinders, neural pathways, molecular bonds) that the target novice audience is unlikely to know, with no prior introduction to what each component is and what states it can be in.
+- A deck on a complex mechanism that skips any orientation to the key parts — going straight to "here's how the system functions" before establishing "here's what each part is."
+- The violation is: NEW TERMS + COMPLEX CAUSAL EXPLANATION + FAST PACE + NOVICE AUDIENCE, all at once, with no prior component familiarization anywhere in the deck.
+
+WHAT IS NOT A VIOLATION — these are the specific conditions where the effect disappears:
+- HIGH PRIOR KNOWLEDGE / EXPERTISE: Clark et al. (2005) and Pollock et al. (2002): pre-training helped low-experience learners with large effect sizes (d=1.84, d=1.22) but showed NO benefit for high-experience learners. Expert audiences already have component models in long-term memory. Do not flag a lesson for an expert audience that skips component introduction.
+- PRE-TRAINING IS PRESENT: Any slide deck that begins with a vocabulary slide, a "key terms" section, a labelled diagram tour, or a components overview IS implementing pre-training. These patterns satisfy the principle — do not flag them.
+- SIMPLE MATERIAL: Pre-training manages "essential overload" — the condition where learning component meanings AND the causal explanation simultaneously exceeds capacity. If the material is simple or uses familiar vocabulary, there is no essential overload and pre-training is unnecessary.
+- SLOW-PACED OR LEARNER-CONTROLLED LESSONS: The principle is most urgent when pace is fast. Mayer notes the need to manage essential processing is "most urgent when essential processing threatens to overload working memory." In a learner-paced deck where terms can be absorbed at the learner's own speed, the need for dedicated pre-training is reduced.
+- GLOSSARY IN MARGIN / CLICKABLE DEFINITIONS: Plass et al. (1998, 2003): giving learners access to definitions or pictures of terms on demand helped comprehension for some learners. Just-in-time definition access achieves similar goals. Do not flag a deck that provides definitions inline or as annotations.
+- TETRIS RESULT: Pilegard & Mayer (2018) found pre-training on Tetris piece names showed negligible benefit (d=0.22) because Tetris itself was not an effective learning activity. The principle requires a meaningful complex lesson to benefit from.
+
+Analyzer calibration: Flag ONLY when (1) the deck targets novice learners, AND (2) the material is genuinely complex with multi-component mechanisms using technical vocabulary, AND (3) there is no vocabulary introduction, labelled component overview, or key terms section anywhere in the deck. Do not flag for expert audiences, simple material, decks that include inline definitions, or learner-paced lessons where learners can absorb terminology at their own pace. The question is: would a novice be overwhelmed by simultaneously learning what the components are AND how they interact, with no prior orientation?
+
+=== MODALITY PRINCIPLE (d=1.00, Ch. 13) ===
+Mayer's definition: "People learn more deeply from pictures and spoken words than from pictures and printed words."
+
+Effect size context: d=1.00 across 19 studies — but 17 of these foundational studies used fast-paced, system-controlled narrated animations (lightning, brakes, pumps, electric motors, environmental science games) with familiar vocabulary and college students as native-language speakers. The final two studies pinpointed boundary conditions: learner-paced GIS slideshow (d=0.16, negligible) and second-language learners (d=−0.83, REVERSED). Ginns (2005) meta-analysis of 39 comparisons: overall d=0.72, strongest for system-paced dynamic graphics and transfer tests. Reinwein (2012): strongest for system-paced rather than student-paced lessons. Tabbers et al. (2004): for learner-controlled slow-paced lessons with technical jargon, effect REVERSED (d=−0.47).
+
+WHAT IS A VIOLATION:
+- An animation or fast-paced instructional video where the explanation of a complex causal process is delivered ONLY as dense full-sentence captions at the bottom of the screen simultaneously with the animation — overloading the visual channel by requiring learners to read AND watch the animation at the same time, with no audio narration available. This is the specific "captioned animation" pattern Mayer studied.
+- A narrated screen recording or video where the speaker's words are duplicated as a full verbatim transcript on screen (graphics + printed text instead of graphics + narration), for a fast-paced system-controlled lesson with familiar vocabulary and native speakers.
+
+WHAT IS NOT A VIOLATION — these are the specific conditions where the effect disappears or reverses:
+- LEARNER-PACED / SELF-PACED DECKS: Mayer, Wells, Parong & Howarth (2019): learner-paced GIS slideshow showed d=0.16 (negligible). Tabbers et al. (2004): learner-paced lesson with technical jargon REVERSED (d=−0.47). When learners control pace, they have time to read and view graphics without visual channel overload. A standard self-paced slide deck with on-screen text does NOT violate the modality principle — learners can read at their own pace.
+- SECOND-LANGUAGE LEARNERS: Lee & Mayer (2018): L2 learners performed BETTER with printed text than narration (d=−0.83 favoring text). Spoken text is transient — L2 learners need to re-read. Do not flag on-screen text for multilingual or international audiences.
+- TECHNICAL / UNFAMILIAR VOCABULARY: When words are technical jargon or unfamiliar, the transient nature of spoken audio becomes a disadvantage — learners cannot re-hear missed terms. Mayer explicitly names this as a boundary condition where printed text may be preferred. Do not flag text-heavy slides about specialized technical content where vocabulary familiarity cannot be assumed.
+- STATIC GRAPHICS (not animations): The modality effect is driven by the competition between reading printed text and simultaneously watching a dynamic animation. Static images or simple diagrams create far less visual channel demand. Reinwein (2012): effect stronger for dynamic than static graphics.
+- SIMPLE MATERIAL / ISOLATED FACTS: Tindall-Ford et al. (1997) and Leahy et al. (2003): the modality effect applies to building mental models, NOT to memorizing isolated elements. A simple factual slide with a static image and a short caption does not create visual channel overload.
+- LONG VERBAL SEGMENTS: Leahy & Sweller (2011); Wong et al. (2012): strong NEGATIVE modality effects when verbal segments were long. Very long spoken narration becomes a disadvantage — the transient nature of audio means learners cannot re-hear missed content. For complex dense narration, printed text may actually be preferred.
+- TEXT-ONLY SLIDES: A slide with only text (no animation or complex graphic) has no visual channel split-attention problem in the first place. There is nothing to split attention between.
+- HEARING IMPAIRMENTS / ACCESSIBILITY: For learners with hearing difficulties, printed text is necessary and not a modality violation.
+
+Analyzer calibration: This principle is about the specific situation where a FAST-PACED, SYSTEM-CONTROLLED animation forces learners to simultaneously read dense caption text AND watch the animation, creating visual channel overload. In a standard self-paced slide deck, learners advance slides at their own pace — visual channel overload is not present, and the modality principle does not apply. Do NOT flag slides for having text on them. Do NOT flag slides for not having audio narration — most slide decks have no audio and that is normal. Only flag if there is clear evidence of (1) an animation or fast-paced video, AND (2) full-sentence dense captions are the only word delivery, AND (3) the pace is system-controlled, AND (4) the audience is native speakers with familiar vocabulary. For any self-paced slide deck, the modality principle simply does not apply.
 """
